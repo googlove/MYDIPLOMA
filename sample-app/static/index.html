@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<link href="css/styles.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<audio id='feedme_speech'   style='display: none;'><source src='feedme-speech.wav'   type='audio/wav'></audio>
+<audio id='opendoor_speech' style='display: none;'><source src='opendoor-speech.wav' type='audio/wav'></audio>
+<audio id='hello_speech'    style='display: none;'><source src='hello.wav' type='audio/wav'></audio>
+
+<div id='intro_div'>
+<h1>Котячий перекладач</h1>
+<p>Ця веб-сторінка демонструє, як можна реалізувати "котячий перекладач", використовуючи модель ШІ, навчену класифікувати котячі голоси до одного з двох класів:</p>
+<ul>
+<li><p>Намір "Відкрий ці двері"</p></li>
+<li><p>Намір "Нагодуй мене"</p></li>
+    <li><p>Намір "Привіт"</p></li>
+</ul>
+</div>
+
+<div class='video_div'>
+<h3>Відео 1: "Відкрийте ці двері"</h3>
+<video id='video1_video' width="320" height="240"><source src="video1.mp4" type="video/mp4"></video>
+<p>Увімкніть відео та перекладіть на мову:</p>
+<button id='video1'>Відтворюй і перекладай</button>
+</div>
+
+<div class='video_div'>
+<h3>Відео 2: "Нагодуй мене"</h3>
+<video id='video2_video' width="320" height="240"><source src="video2.mp4" type="video/mp4"></video>
+<p>Увімкніть відео та перекладіть на мову:</p>
+<button id='video2'>Відтворюй і перекладай</button>
+</div>
+
+<div class='video_div'>
+<h3>Відео 3: "Привіт"</h3>
+<video id='video3_video' width="320" height="240"><source src="video3.mp4" type="video/mp4"></video>
+<p>Увімкніть відео та перекладіть на мову:</p>
+<button id='video3'>Відтворюй і перекладай</button>
+</div>
+
+<div class='results_div'>
+<h3>Результати з моделі</h3>
+<div id='results_json_div'>
+<div id='results_spinner'      style='display: none;' class='spinner'></div>
+<pre id='returned_results_div' style='display: none;'></pre>
+
+
+
+
+<script>
+
+$( "button" ).click( function()
+{
+    vid_id = this.id;
+    document.getElementById( vid_id + '_video' ).play();
+    setTimeout( function()
+    {
+        document.getElementById( 'returned_results_div' ).style.display = 'none';
+        document.getElementById( 'results_spinner'      ).style.display = 'block';
+        $.ajax( { method: "GET",
+                  url: "./translate?vid_id=" + vid_id,
+                  contentType : "application/json",
+                  success     : function( result )
+                                {
+                                    document.getElementById( 'results_spinner' ).style.display = 'none';
+                                    document.getElementById( 'returned_results_div' ).innerHTML = "Top class: " + result.top_class + "\n\n" + "Confidence: " + result.confidence + "%";
+                                    document.getElementById( 'returned_results_div' ).style.display = 'block';
+                                    document.getElementById( result.top_class + '_speech' ).play();
+                                }
+                } );
+    }, 2000 );
+} );
+</script>
+
+</body>
+
+</html>
+
